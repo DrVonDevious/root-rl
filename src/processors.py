@@ -2,14 +2,14 @@ import esper
 import tcod.event
 import sys
 
-from components.physics import Velocity, Position, Collision
+from components.physics import Velocity, Position, Collision, Grabbable
 from components.graphics import Render, TileLayer, GroundLayer, MobLayer
 
 
 class MovementProcessor(esper.Processor):
-    def process(self, scene, console, camera):
+    def process(self, scene):
         self.scene = scene
-        self.camera = camera
+        self.camera = self.scene.camera
 
         if (self.scene.action.get("move")):
             self.action = self.scene.action.get("move")
@@ -49,10 +49,38 @@ class MovementProcessor(esper.Processor):
         self.scene.playerVel.dx = 0
         self.scene.playerVel.dy = 0
 
+
+class ActionProcessor(esper.Processor):
+    def process(self, scene):
+        self.scene = scene
+
+        if (self.scene.action.get("grab")):
+            self.grabbables = self.world.get_components(Grabbable, Position)
+
+            for entity, (grabbable, position) in self.grabbables:
+                player_position = (self.scene.playerPos.x, self.scene.playerPos.y)
+                entity_position = (position.x, position.y)
+                if entity_position == player_position:
+                    self.world.remove_component(entity, Position)
+                    self.world.remove_component(entity, Render)
+
+            self.scene.action = {}
+
+
+class CommandProcessor(esper.Processor):
+    def process(self, scene):
+        self.scene = scene
+
+        if (self.scene.action.get("look_at_inventory")):
+            print("INVENTORY!")
+
+            self.scene.action = {}
+
 class MapProcessor(esper.Processor):
-    def process(self, scene, console, camera):
-        self.console = console
-        self.camera = camera
+    def process(self, scene):
+        self.scene = scene
+        self.console = self.scene.console
+        self.camera = self.scene.camera
 
         self.process_tile_layer()
         self.process_ground_layer()
@@ -108,7 +136,7 @@ class InputProcessor(esper.Processor):
     def __init__(self):
         super().__init__()
 
-    def process(self, scene, console, camera):
+    def process(self, scene):
         self.scene = scene
 
         for event in tcod.event.get():
@@ -128,7 +156,13 @@ class InputProcessor(esper.Processor):
                 elif event.sym == tcod.event.K_RIGHT:
                     self.scene.action = {"move": (1, 0)}
 
-                elif event.sym == tcod.event.K_d:
+                elif event.sym == tcod.event.K_g:
+                    self.scene.action = {"grab": "self"}
+
+                elif event.sym == tcod.event.K_i:
+                    self.scene.action = {"look_at_inventory": "self"}
+
+                elif event.sym == tcod.event.K_d and event.mod == tcod.event.KMOD_LSHIFT:
                     self.scene.debug_mode = not self.scene.debug_mode
 
                 else:

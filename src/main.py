@@ -10,7 +10,13 @@ from factories.player import Player
 from factories.ground_clutter import Rock
 from components.physics import Position, Velocity, Grabbable
 from components.graphics import Render
-from processors import MovementProcessor, MapProcessor, InputProcessor
+
+from processors import\
+    MovementProcessor,\
+    MapProcessor,\
+    InputProcessor,\
+    ActionProcessor,\
+    CommandProcessor
 
 class SceneManager:
     def __init__(self, world = None, state = "game", context = None, console = None):
@@ -64,6 +70,8 @@ class Game():
         self.camera.initCamera(40, 25)
 
         self.world.add_processor(MovementProcessor())
+        self.world.add_processor(ActionProcessor())
+        self.world.add_processor(CommandProcessor())
         self.world.add_processor(MapProcessor())
         self.world.add_processor(InputProcessor())
 
@@ -77,7 +85,7 @@ class Game():
         )
 
     def update(self):
-        self.world.process(self, self.console, self.camera)
+        self.world.process(self)
 
         self.fps_counter += 1
         if (time.time() - self.start_time) > self.fps_span:
