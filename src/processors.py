@@ -69,6 +69,9 @@ class ActionProcessor(esper.Processor):
                     self.player_inventory = self.scene.world.component_for_entity(self.scene.player, Inventory)
                     self.player_inventory.entities.append(entity)
 
+                    self.entity_name = self.scene.world.component_for_entity(entity, Name).name
+                    self.scene.message_log.add_message(f"You picked up a {self.entity_name}")
+
                     return
 
             self.scene.action = {}
@@ -88,6 +91,13 @@ class CommandProcessor(esper.Processor):
                 print(entity_name)
 
             self.scene.action = {}
+
+
+class UIProcessor(esper.Processor):
+    def process(self, scene):
+        self.scene = scene
+
+        self.scene.message_log.render(self.scene.console, 0, 42, 40, 8)
 
 
 class MapProcessor(esper.Processor):

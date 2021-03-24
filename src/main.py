@@ -6,6 +6,7 @@ import time
 
 from game_map import Map
 from camera import Camera
+from messages import MessageLog
 from factories.player import Player
 from factories.ground_clutter import Rock
 from components.physics import Position, Velocity, Grabbable
@@ -16,7 +17,8 @@ from processors import\
     MapProcessor,\
     InputProcessor,\
     ActionProcessor,\
-    CommandProcessor
+    CommandProcessor,\
+    UIProcessor
 
 
 class SceneManager:
@@ -47,6 +49,7 @@ class Game():
         self.playerFactory = Player(self.world)
         self.rockFactory = Rock(self.world)
         self.camera = Camera()
+        self.message_log = MessageLog()
 
         self.fps = 1.0
         self.start_time = time.time()
@@ -80,6 +83,7 @@ class Game():
         self.world.add_processor(CommandProcessor())
         self.world.add_processor(MapProcessor())
         self.world.add_processor(InputProcessor())
+        self.world.add_processor(UIProcessor())
 
         self.game_map.generate_map()
 
@@ -102,21 +106,21 @@ class Game():
         if self.debug_mode:
             self.console.print(
                 0,
-                47,
+                0,
                 f"FPS: {self.fps}",
                 (255, 255, 0)
             )
 
             self.console.print(
                 0,
-                48,
+                1,
                 f"Chunk: {int(self.playerPos.x / self.game_map.chunkWidth)}, {int(self.playerPos.y / self.game_map.chunkHeight)}",
                 (255, 255, 255)
             )
 
             self.console.print(
                 0,
-                49,
+                2,
                 f"Player Position: {self.playerPos.x}, {self.playerPos.y}",
                 (255, 255, 255)
             )
