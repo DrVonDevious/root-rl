@@ -1,5 +1,6 @@
 from components.physics import Position, Velocity
 from components.graphics import Render, MobLayer
+from components.storage import Inventory
 
 class Player:
     def __init__(self, world):
@@ -9,6 +10,7 @@ class Player:
         self.player = self.world.create_entity()
         self.world.add_component(self.player, Position(0, 0))
         self.world.add_component(self.player, Velocity(0, 0))
+        self.world.add_component(self.player, Inventory([]))
         self.world.add_component(self.player, Render("@", (255, 255, 255)))
         self.world.add_component(self.player, MobLayer())
 

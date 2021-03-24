@@ -15,3 +15,9 @@ class Collision:
 class Grabbable:
     def __init__(self, size):
         self.size = size
+
+class Opaque:
+    pass
+
+class Translucent:
+    pass

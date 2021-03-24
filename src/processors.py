@@ -2,9 +2,10 @@ import esper
 import tcod.event
 import sys
 
-from components.physics import Velocity, Position, Collision, Grabbable
+from components.physics import Velocity, Position, Collision, Grabbable, Translucent
 from components.graphics import Render, TileLayer, GroundLayer, MobLayer
-
+from components.storage import Inventory
+from components.stats import Name
 
 class MovementProcessor(esper.Processor):
     def process(self, scene):
@@ -60,9 +61,15 @@ class ActionProcessor(esper.Processor):
             for entity, (grabbable, position) in self.grabbables:
                 player_position = (self.scene.playerPos.x, self.scene.playerPos.y)
                 entity_position = (position.x, position.y)
+
                 if entity_position == player_position:
                     self.world.remove_component(entity, Position)
                     self.world.remove_component(entity, Render)
+
+                    self.player_inventory = self.scene.world.component_for_entity(self.scene.player, Inventory)
+                    self.player_inventory.entities.append(entity)
+
+                    return
 
             self.scene.action = {}
 
@@ -72,9 +79,16 @@ class CommandProcessor(esper.Processor):
         self.scene = scene
 
         if (self.scene.action.get("look_at_inventory")):
-            print("INVENTORY!")
+            self.player_inventory = self.scene.world.component_for_entity(self.scene.player, Inventory)
+
+            print("INVENTORY:")
+
+            for entity in self.player_inventory.entities:
+                entity_name = self.world.component_for_entity(entity, Name).name
+                print(entity_name)
 
             self.scene.action = {}
+
 
 class MapProcessor(esper.Processor):
     def process(self, scene):
@@ -130,6 +144,9 @@ class MapProcessor(esper.Processor):
                     render.icon,
                     render.color
                 )
+
+    def process_fov(self):
+        pass
 
 
 class InputProcessor(esper.Processor):

@@ -18,6 +18,7 @@ from processors import\
     ActionProcessor,\
     CommandProcessor
 
+
 class SceneManager:
     def __init__(self, world = None, state = "game", context = None, console = None):
         self.world = world
@@ -34,6 +35,7 @@ class SceneManager:
         while True:
             self.current_scene.update()
 
+
 class Game():
     def __init__(self, world = None, context = None, console = None):
         self.world = world
@@ -43,7 +45,7 @@ class Game():
         self.action = {}
 
         self.playerFactory = Player(self.world)
-        self.rockFactory = Rock(self.world, "flint", 3, 8)
+        self.rockFactory = Rock(self.world)
         self.camera = Camera()
 
         self.fps = 1.0
@@ -52,11 +54,15 @@ class Game():
         self.fps_counter = 0
         self.debug_mode = False
 
-        self.rock_id = self.rockFactory.assemble_rock()
+        # rock testing
+        self.rock = self.rockFactory.assemble_rock("flint", 4, -10)
+        self.rock = self.rockFactory.assemble_rock("stone", 14, 7)
+        self.rock = self.rockFactory.assemble_rock("gneiss", 9, -1)
+        self.rock = self.rockFactory.assemble_rock("sandstone", -4, 8)
 
-        self.player_id = self.playerFactory.assemble_player()
-        self.playerPos = self.world.component_for_entity(self.player_id, Position)
-        self.playerVel = self.world.component_for_entity(self.player_id, Velocity)
+        self.player = self.playerFactory.assemble_player()
+        self.playerPos = self.world.component_for_entity(self.player, Position)
+        self.playerVel = self.world.component_for_entity(self.player, Velocity)
 
         self.game_map = Map(
             self.world,
@@ -117,6 +123,7 @@ class Game():
 
         self.context.present(self.console)
         self.console.clear()
+
 
 def main() -> None:
     config = configparser.ConfigParser()
